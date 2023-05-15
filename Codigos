@@ -1,0 +1,203 @@
+exerc 1 -
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definição da estrutura do nó da lista
+typedef struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+} Node;
+
+// Função para criar um novo nó
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Função para inserir um nó no início da lista
+void insertAtBeginning(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+}
+
+// Função para imprimir a lista
+void printList(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Função para concatenar duas listas
+void concatenateLists(Node** list1, Node** list2) {
+    if (*list1 == NULL) {
+        *list1 = *list2;
+    } else if (*list2 != NULL) {
+        Node* temp = *list1;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = *list2;
+        (*list2)->prev = temp;
+    }
+    *list2 = NULL;
+}
+
+// Função para separar uma lista em duas novas listas
+void splitList(Node** originalList, Node** list1, Node** list2) {
+    if (*originalList == NULL || (*originalList)->next == NULL) {
+        *list1 = *originalList;
+        *list2 = NULL;
+    } else {
+        Node* slow = *originalList;
+        Node* fast = (*originalList)->next;
+        while (fast != NULL) {
+            fast = fast->next;
+            if (fast != NULL) {
+                slow = slow->next;
+                fast = fast->next;
+            }
+        }
+        *list1 = *originalList;
+        *list2 = slow->next;
+        slow->next = NULL;
+        (*list2)->prev = NULL;
+    }
+}
+
+// Função para inserir um nó em ordem em uma lista
+void insertInOrder(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL || (*head)->data >= data) {
+        newNode->next = *head;
+        if (*head != NULL) {
+            (*head)->prev = newNode;
+        }
+        *head = newNode;
+    } else {
+        Node* temp = *head;
+        while (temp->next != NULL && temp->next->data < data) {
+            temp = temp->next;
+        }
+        newNode->next = temp->next;
+        newNode->prev = temp;
+        if (temp->next != NULL) {
+            temp->next->prev = newNode;
+        }
+        temp->next = newNode;
+    }
+}
+
+// Função para intercalar duas listas ordenadas em uma lista ordenada
+Node* mergeLists(Node* list1, Node* list2) {
+    Node* mergedList = NULL;
+    Node* tail = NULL;
+
+    while (list1 != NULL && list2 != NULL) {
+        if (list1->data <= list2->data) {
+            if (mergedList == NULL) {
+                mergedList = list1;
+                tail = list1;
+            } else {
+                tail->next = list1;
+                list1->prev = tail;
+                tail = list1;
+            }
+            list1 = list1->next;
+        } else {
+            if (mergedList == NULL) {
+                mergedList = list2;
+                tail = list2;
+            } else {
+                tail->next = list2;
+                list2->prev = tail;
+                tail = list2;
+            }
+            list2 = list2->next;
+        }
+    }
+
+    if (list1 != NULL) {
+        tail->next = list1;
+        list1->prev = tail;
+    } else if (list2 != NULL) {
+        tail->next = list2;
+        list2->prev = tail;
+    }
+
+    return mergedList;
+}
+
+// Função para imprimir a lista em ordem inversa
+void printReverseList(Node* tail) {
+    Node* temp = tail;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+// Função principal
+int main() {
+    Node* list1 = NULL;
+    Node* list2 = NULL;
+
+    // Exemplo de uso
+
+    // Populando a lista 1
+    insertInOrder(&list1, 1);
+    insertInOrder(&list1, 3);
+    insertInOrder(&list1, 5);
+    printf("Lista 1: ");
+    printList(list1);
+
+    // Populando a lista 2
+    insertInOrder(&list2, 2);
+    insertInOrder(&list2, 4);
+    insertInOrder(&list2, 6);
+    printf("Lista 2: ");
+    printList(list2);
+
+    // Concatenando as listas
+    concatenateLists(&list1, &list2);
+    printf("Listas concatenadas: ");
+    printList(list1);
+
+    // Separando a lista em duas
+    Node* list3 = NULL;
+    Node* list4 = NULL;
+    splitList(&list1, &list3, &list4);
+    printf("Lista 1: ");
+    printList(list3);
+    printf("Lista 2: ");
+    printList(list4);
+
+    // Intercale as listas ordenadas
+    Node* mergedList = mergeLists(list3, list4);
+    printf("Lista intercalada: ");
+    printList(mergedList);
+    printf("Lista intercalada em ordem inversa: ");
+    printReverseList(mergedList);
+
+    return 0;
+}
+exerc 2 -
+
+exerc 3 -
+
+exerc 4 -
+
+exerc 5 -
