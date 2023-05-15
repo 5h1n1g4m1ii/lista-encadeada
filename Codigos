@@ -195,9 +195,645 @@ int main() {
     return 0;
 }
 exerc 2 -
+#include <stdio.h>
+#include <stdlib.h>
 
+// Definição da estrutura do nó da lista
+typedef struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+} Node;
+
+// Definição da estrutura da lista
+typedef struct DoublyLinkedList {
+    Node* head;
+} DoublyLinkedList;
+
+// Função para criar uma nova lista
+DoublyLinkedList* createList() {
+    DoublyLinkedList* newList = (DoublyLinkedList*)malloc(sizeof(DoublyLinkedList));
+    newList->head = NULL;
+    return newList;
+}
+
+// Função para criar um novo nó
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Função para inserir um nó no início da lista
+void insertAtBeginning(DoublyLinkedList* list, int data) {
+    Node* newNode = createNode(data);
+    if (list->head == NULL) {
+        list->head = newNode;
+    } else {
+        newNode->next = list->head;
+        list->head->prev = newNode;
+        list->head = newNode;
+    }
+}
+
+// Função para inserir um nó no final da lista
+void insertAtEnd(DoublyLinkedList* list, int data) {
+    Node* newNode = createNode(data);
+    if (list->head == NULL) {
+        list->head = newNode;
+    } else {
+        Node* temp = list->head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->prev = temp;
+    }
+}
+
+// Função para imprimir a lista
+void printList(DoublyLinkedList* list) {
+    Node* temp = list->head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Função para buscar um elemento na lista
+Node* searchElement(DoublyLinkedList* list, int data) {
+    Node* temp = list->head;
+    while (temp != NULL) {
+        if (temp->data == data) {
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL; // Elemento não encontrado
+}
+
+// Função para inserir um elemento após um determinado nó
+void insertAfterNode(DoublyLinkedList* list, Node* node, int data) {
+    if (node == NULL) {
+        return; // Nó inválido
+    }
+
+    Node* newNode = createNode(data);
+
+    newNode->prev = node;
+    newNode->next = node->next;
+
+    if (node->next != NULL) {
+        node->next->prev = newNode;
+    }
+
+    node->next = newNode;
+}
+
+// Função para remover um nó da lista
+void deleteNode(DoublyLinkedList* list, Node* node) {
+    if (node == NULL) {
+        return; // Nó inválido
+    }
+
+    if (node->prev != NULL) {
+        node->prev->next = node->next;
+    } else {
+        list->head = node->next;
+    }
+
+    if (node->next != NULL) {
+        node->next->prev = node->prev;
+    }
+
+    free(node);
+}
+// Função principal
+int main() {
+    DoublyLinkedList* list = createList();
+
+    // Inserindo elementos na lista
+    insertAtBeginning(list, 1);
+    insertAtEnd(list, 2);
+    insertAtEnd(list, 3);
+    insertAtEnd(list, 4);
+
+    // Imprimindo a lista
+    printf("Lista: ");
+    printList(list);
+
+    // Buscando um elemento na lista
+    int searchData = 3;
+    Node* foundNode = searchElement(list, searchData);
+    if (foundNode != NULL) {
+        printf("Elemento %d encontrado na lista.\n", searchData);
+    } else {
+        printf("Elemento %d não encontrado na lista.\n", searchData);
+    }
+
+    // Inserindo um elemento após um nó específico
+    int insertData = 5;
+    insertAfterNode(list, foundNode, insertData);
+
+    // Imprimindo a lista novamente
+    printf("Lista após inserção: ");
+    printList(list);
+
+    // Removendo um nó da lista
+    deleteNode(list, foundNode);
+
+    // Imprimindo a lista novamente
+    printf("Lista após remoção: ");
+    printList(list);
+
+    return 0;
+}
 exerc 3 -
+#include <stdio.h>
+#include <stdlib.h>
 
+// Definição da estrutura do nó da lista
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Função para criar um novo nó
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Função para contar o número de elementos em uma lista circular
+int countElements(Node* head) {
+    if (head == NULL) {
+        return 0;
+    }
+
+    int count = 1;
+    Node* temp = head->next;
+    while (temp != head) {
+        count++;
+        temp = temp->next;
+    }
+
+    return count;
+}
+
+// Função para inserir um elemento à esquerda da cabeça da lista
+void insertAtLeft(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->next = newNode;
+    } else {
+        Node* temp = *head;
+        while (temp->next != *head) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = *head;
+        *head = newNode;
+    }
+}
+
+// Função para concatenar duas listas circulares
+void concatenateLists(Node** list1, Node** list2) {
+    if (*list1 == NULL) {
+        *list1 = *list2;
+    } else if (*list2 != NULL) {
+        Node* temp1 = (*list1)->next;
+        Node* temp2 = (*list2)->next;
+
+        (*list1)->next = *list2;
+        (*list2)->next = temp1;
+
+        Node* temp = *list2;
+        while (temp->next != *list2) {
+            temp = temp->next;
+        }
+        temp->next = temp2;
+    }
+    *list2 = NULL;
+}
+
+// Função para intercalar duas listas ordenadas circulares
+Node* mergeLists(Node* list1, Node* list2) {
+    if (list1 == NULL) {
+        return list2;
+    } else if (list2 == NULL) {
+        return list1;
+    }
+
+    Node* mergedList = NULL;
+    Node* temp1 = list1;
+    Node* temp2 = list2;
+
+    if (temp1->data <= temp2->data) {
+        mergedList = temp1;
+        temp1 = temp1->next;
+    } else {
+        mergedList = temp2;
+        temp2 = temp2->next;
+    }
+
+    Node* temp = mergedList;
+
+    while (temp1 != list1 && temp2 != list2) {
+        if (temp1->data <= temp2->data) {
+            temp->next = temp1;
+            temp1 = temp1->next;
+        } else {
+            temp->next = temp2;
+            temp2 = temp2->next;
+        }
+        temp = temp->next;
+    }
+
+    if (temp1 == list1) {
+        temp->next = temp2;
+    } else {
+        temp->next = temp1;
+    }
+
+    return mergedList;
+}
+
+// Função para fazer uma cópia da lista circular
+Node* copyList(Node* head) {
+    if (head == NULL) {
+        return NULL;
+    }
+
+    Node* copiedList = createNode(head->data);
+    Node* temp = head->next;
+    Node* newHead = copiedList;
+
+    while (temp != head) {
+        Node* newNode = createNode(temp->data);
+        copiedList->next = newNode;
+        copiedList = copiedList->next;
+        temp = temp->next;
+    }
+
+    copiedList->next = newHead;
+
+    return newHead;
+}
+
+// Função para imprimir a lista circular
+void printList(Node* head) {
+    if (head == NULL) {
+        printf("Lista vazia.\n");
+        return;
+    }
+
+    Node* temp = head;
+    printf("Lista: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("\n");
+}
+
+// Função principal
+int main() {
+    Node* list1 = NULL;
+    Node* list2 = NULL;
+
+    // Inserindo elementos na lista 1
+    insertAtLeft(&list1, 1);
+    insertAtLeft(&list1, 2);
+    insertAtLeft(&list1, 3);
+
+    // Inserindo elementos na lista 2
+    insertAtLeft(&list2, 4);
+    insertAtLeft(&list2, 5);
+    insertAtLeft(&list2, 6);
+
+    // Contando o número de elementos na lista 1
+    int count = countElements(list1);
+    printf("Número de elementos na lista 1: %d\n", count);
+
+    // Concatenando as listas 1 e 2
+    concatenateLists(&list1, &list2);
+    printf("Lista concatenada: ");
+    printList(list1);
+
+    // Intercalando duas listas ordenadas
+    Node* mergedList = mergeLists(list1, list2);
+    printf("Lista intercalada: ");
+    printList(mergedList);
+
+    // Fazendo uma cópia da lista circular
+    Node* copiedList = copyList(list1);
+    printf("Lista copiada: ");
+    printList(copiedList);
+
+    return 0;
+}
 exerc 4 -
+#include <stdio.h>
+#include <stdlib.h>
 
+// Definição da estrutura do nó da lista
+typedef struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+} Node;
+
+// Função para criar um novo nó
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Função para contar o número de elementos em uma lista circular duplamente encadeada
+int countElements(Node* head) {
+    if (head == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    Node* temp = head;
+    do {
+        count++;
+        temp = temp->next;
+    } while (temp != head);
+
+    return count;
+}
+
+// Função para inserir um elemento à esquerda da cabeça da lista circular duplamente encadeada
+void insertAtLeft(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        newNode->prev = newNode;
+        newNode->next = newNode;
+    } else {
+        newNode->prev = (*head)->prev;
+        newNode->next = *head;
+        (*head)->prev->next = newNode;
+        (*head)->prev = newNode;
+        *head = newNode;
+    }
+}
+
+// Função para concatenar duas listas circulares duplamente encadeadas
+void concatenateLists(Node** list1, Node** list2) {
+    if (*list1 == NULL) {
+        *list1 = *list2;
+    } else if (*list2 != NULL) {
+        Node* temp1 = (*list1)->prev;
+        Node* temp2 = (*list2)->prev;
+
+        (*list1)->prev = temp2;
+        temp2->next = *list1;
+
+        temp1->next = *list2;
+        (*list2)->prev = temp1;
+    }
+    *list2 = NULL;
+}
+
+// Função para intercalar duas listas ordenadas circulares duplamente encadeadas
+Node* mergeLists(Node* list1, Node* list2) {
+    if (list1 == NULL) {
+        return list2;
+    } else if (list2 == NULL) {
+        return list1;
+    }
+
+    Node* mergedList = NULL;
+    Node* temp1 = list1;
+    Node* temp2 = list2;
+
+    if (temp1->data <= temp2->data) {
+        mergedList = temp1;
+        temp1 = temp1->next;
+    } else {
+        mergedList = temp2;
+        temp2 = temp2->next;
+    }
+
+    Node* temp = mergedList;
+
+    while (temp1 != list1 && temp2 != list2) {
+        if (temp1->data <= temp2->data) {
+            temp->next = temp1;
+            temp1->prev = temp;
+            temp1 = temp1->next;
+        } else {
+            temp->next = temp2;
+            temp2->prev = temp;
+            temp2 = temp2->next;
+        }
+        temp = temp->next;
+    }
+
+    if (temp1 == list1) {
+        temp->next = temp2;
+        temp2->prev = temp;
+    } else {
+        temp->next = temp1;
+        temp1->prev = temp;  }
+
+    return mergedList;
+}
+
+// Função para fazer uma cópia da lista circular duplamente encadeada
+Node* copyList(Node* head) {
+    if (head == NULL) {
+        return NULL;
+    }
+
+    Node* copiedList = NULL;
+    Node* temp = head;
+
+    do {
+        Node* newNode = createNode(temp->data);
+        if (copiedList == NULL) {
+            copiedList = newNode;
+            copiedList->prev = newNode;
+            copiedList->next = newNode;
+        } else {
+            newNode->prev = copiedList->prev;
+            newNode->next = copiedList;
+            copiedList->prev->next = newNode;
+            copiedList->prev = newNode;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    return copiedList;
+}
+
+// Função para imprimir a lista circular duplamente encadeada
+void printList(Node* head) {
+    if (head == NULL) {
+        printf("Lista vazia.\n");
+        return;
+    }
+
+    Node* temp = head;
+    printf("Lista: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("\n");
+}
+
+// Função principal
+int main() {
+    Node* list1 = NULL;
+    Node* list2 = NULL;
+
+    // Inserindo elementos na lista 1
+    insertAtLeft(&list1, 1);
+    insertAtLeft(&list1, 2);
+    insertAtLeft(&list1, 3);
+
+    // Inserindo elementos na lista 2
+    insertAtLeft(&list2, 4);
+    insertAtLeft(&list2, 5);
+    insertAtLeft(&list2, 6);
+
+    // Contando o número de elementos na lista 1
+    int count = countElements(list1);
+    printf("Número de elementos na lista 1: %d\n", count);
+
+    // Concatenando as listas 1 e 2
+    concatenateLists(&list1, &list2);
+    printf("Lista concatenada: ");
+    printList(list1);
+
+    // Intercalando duas listas ordenadas
+    Node* mergedList = mergeLists(list1, list2);
+    printf("Lista intercalada: ");
+    printList(mergedList);
+
+    // Fazendo uma cópia da lista circular duplamente encadeada
+    Node* copiedList = copyList(list1);
+    printf("Lista copiada: ");
+    printList(copiedList);
+
+    return 0;
+}
 exerc 5 -
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definição da estrutura do nó da lista
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Função para criar um novo nó
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Função para inicializar a lista circular com nó cabeça
+Node* initList() {
+    Node* head = createNode(0);
+    head->next = head;
+    return head;
+}
+
+// Função para contar o número de elementos em uma lista circular com nó cabeça
+int countElements(Node* head) {
+    if (head == NULL || head->next == head) {
+        return 0;
+    }
+
+    int count = 0;
+    Node* temp = head->next;
+    while (temp != head) {
+        count++;
+        temp = temp->next;
+    }
+
+    return count;
+}
+
+// Função para inserir um elemento à esquerda da cabeça da lista circular com nó cabeça
+void insertAtLeft(Node* head, int data) {
+    Node* newNode = createNode(data);
+    newNode->next = head->next;
+    head->next = newNode;
+}
+
+// Função para concatenar duas listas circulares com nó cabeça
+void concatenateLists(Node* list1, Node* list2) {
+    Node* temp = list1;
+    while (temp->next != list1) {
+        temp = temp->next;
+    }
+    temp->next = list2->next;
+
+    temp = list2;
+    while (temp->next != list2) {
+        temp = temp->next;
+    }
+    temp->next = list1;
+    free(list2);
+}
+
+// Função para imprimir a lista circular com nó cabeça
+void printList(Node* head) {
+    if (head == NULL || head->next == head) {
+        printf("Lista vazia.\n");
+        return;
+    }
+
+    Node* temp = head->next;
+    printf("Lista: ");
+    while (temp != head) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Função principal
+int main() {
+    Node* head = initList();
+
+    // Inserindo elementos na lista
+    insertAtLeft(head, 1);
+    insertAtLeft(head, 2);
+    insertAtLeft(head, 3);
+
+    // Contando o número de elementos na lista
+    int count = countElements(head);
+    printf("Número de elementos na lista: %d\n", count);
+
+    // Criando uma nova lista circular
+    Node* newList = initList();
+    insertAtLeft(newList, 4);
+    insertAtLeft(newList, 5);
+    insertAtLeft(newList, 6);
+
+    // Concatenando as listas
+    concatenateLists(head, newList);
+    printf("Lista concatenada: ");
+    printList(head);
+
+    return 0;
+}
